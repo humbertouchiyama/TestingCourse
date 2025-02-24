@@ -2,6 +2,8 @@ package com.plcoding.testingcourse.core.domain
 
 import assertk.assertFailure
 import assertk.assertThat
+import assertk.assertions.contains
+import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import com.plcoding.testingcourse.core.data.ShoppingCartCacheFake
 import org.junit.jupiter.api.BeforeEach
@@ -34,7 +36,7 @@ internal class ShoppingCartTest {
     ) {
         // GIVEN
         val product = Product(
-            id = 0,
+            id = 1,
             name = "Ice cream",
             price = 5.0
         )
@@ -44,7 +46,23 @@ internal class ShoppingCartTest {
         val priceSum = cart.getTotalCost()
 
         // ASSERTION
-        assertThat(priceSum).isEqualTo(quantity * 5.0)
+        assertThat(priceSum).isEqualTo(expectedPriceSum)
+    }
+
+    @Test
+    fun `Products are properly saved in cache`() {
+        val product = Product(
+            id = 1,
+            name = "Ice cream",
+            price = 5.0
+        )
+        cart.addProduct(product, 2)
+
+        val productsFromCache = cacheFake.loadCart()
+
+        assertThat(productsFromCache).hasSize(2)
+        assertThat(productsFromCache).contains(product)
+
     }
 
     @RepeatedTest(100)
